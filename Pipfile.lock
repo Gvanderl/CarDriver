@@ -16,7 +16,7 @@
         ]
     },
     "default": {
-        "pygame": {
+        "pg": {
             "hashes": [
                 "sha256:010c2e49f15de8ca24e15ce51df6911f5d0804f2c484bd9c67ffc8ed78e452f0",
                 "sha256:0267b4def5c07e3b08329f80cb51c8c457d514221f6a2d5ec175569bd02280c9",
