@@ -69,6 +69,7 @@ class Player(pg.sprite.Sprite):
                           -self.speed * math.sin(math.radians(self.angle)))
         self.rect = self.rect.clamp(pg.Rect(0, 0, level_width, level_height))
 
+        # Check for collisions
         self.collide()
 
     def collide(self):
@@ -90,7 +91,6 @@ class CameraAwareLayeredUpdates(pg.sprite.LayeredUpdates):
         self.target = target
         self.cam = pg.Vector2(0, 0)
         self.world_size = world_size
-        self.font = pg.font.SysFont('Times New Roman', 60)
         if self.target:
             self.add(target)
 
@@ -119,7 +119,4 @@ class CameraAwareLayeredUpdates(pg.sprite.LayeredUpdates):
                     dirty.append(newrect)
                     dirty.append(rec)
             spritedict[spr] = newrect
-            if isinstance(spr, Player):
-                text = self.font.render(f"Speed : {spr.speed:.2f}", True, Color("red"))
-                surface.blit(text, SCREEN_RECT.topleft)
         return dirty

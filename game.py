@@ -4,6 +4,7 @@ from gameEntities import *
 def main():
 
     pg.init()
+    font = pg.font.SysFont('Times New Roman', 60)
     display = pg.display.set_mode(SCREEN_RECT.size)
     pg.display.set_caption("Ultra Racr")
     clock = pg.time.Clock()
@@ -29,11 +30,13 @@ def main():
 
         entities.update()
 
-        display.fill(Color("Gray21"))
+        display.fill(Color("DarkGrey"))
         entities.draw(display)
+        text = font.render(f"FPS : {clock.get_fps()}", True, Color("red"))
+        display.blit(text, SCREEN_RECT.topleft)
         pg.display.update()
 
-        clock.tick()
+        clock.tick(60)
 
 
 if __name__ == "__main__":

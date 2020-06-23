@@ -6,7 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pg = "==2.0.0.dev8"
+noise = "*"
+pygame = "==2.0.0.dev8"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"
