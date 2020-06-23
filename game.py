@@ -27,11 +27,12 @@ class Player(pg.sprite.Sprite):
     car_size = (50, 40)
     max_speed = 10
 
-    def __init__(self):
+    def __init__(self, terrain):
         super().__init__()
         self.original_image = load_image("car.png", self.car_size)
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect(midbottom=SCREEN_RECT.midbottom)
+        self.terrain = terrain
 
     def speed_curve(self, x):
         return self.max_speed * 2 * ((1 / (1 + math.exp(-x / 10))) - 0.5)
@@ -55,7 +56,6 @@ class Player(pg.sprite.Sprite):
             if self.angle > 180:
                 self.angle -= 360
 
-        
         # Rotate car and rectangle
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect(topleft=self.rect.topleft)
@@ -65,6 +65,21 @@ class Player(pg.sprite.Sprite):
                           -self.speed * math.sin(math.radians(self.angle)))
         self.rect = self.rect.clamp(SCREEN_RECT)
 
+    def collide(self, xvel, yvel, terrain):
+        for p in platforms:
+            if pg.sprite.collide_rect(self, p):
+                if isinstance(p, FinishBlock):
+                    pg.event.post(pg.event.Event(pg.QUIT))
+                if xvel > 0:
+                    self.rect.right = p.rect.left
+                if xvel < 0:
+                    self.rect.left = p.rect.right
+                if yvel > 0:
+                    self.rect.bottom = p.rect.top
+                    self.onGround = True
+                    self.yvel = 0
+                if yvel < 0:
+                    self.rect.top = p.rect.bottom
 
 
 class CameraAwareLayeredUpdates(pg.sprite.LayeredUpdates):
@@ -127,7 +142,7 @@ class FinishBlock(Terrain):
 
 SPRITES_DIR = Path(__file__).resolve().parent / "sprites"
 SCREEN_RECT = pg.Rect((0, 0, 800, 640))
-TILE_SIZE = 32
+TILE_SIZE = 16
 
 
 def main():
@@ -142,22 +157,33 @@ def main():
     font = pg.font.SysFont('Times New Roman', 20)
     level = [
         "GGGGGGGGGGGGGGGGGFFFFFFFFFGGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGGG         GGGGGGGGGGGGGGGGGG",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
+        "G                                          G",
     ]
 
     terrain = pg.sprite.Group()
@@ -183,10 +209,8 @@ def main():
 
         display.fill(Color("White"))
         entities.draw(display)
+        display.blit(player.image, player.rect)
         pg.display.update()
-
-        pressed_keys = pg.key.get_pressed()
-        player.move()
 
         show_text(f"Speed : {player.speed:.2f} Current Angle : {player.angle:.2f} ")
 
